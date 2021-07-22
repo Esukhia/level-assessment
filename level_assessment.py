@@ -30,12 +30,69 @@ level_code_lookup = {
     'l2': '#afa',
     'l3': '#faa'
 }
-
 pos_ann = {
-    'VERB': '#8ef',
-    'NOUN': '#afa',
-    'PART': '#faa'
+    'ADJ': {
+        'lable':"རྒྱན",
+        'color_code': '#FF9'
+        },
+    'ADP': {
+        'lable':"སྦྱོར",
+        'color_code': '#8ef'
+        },
+    'ADV': {
+        'lable':"བསྣན",
+        'color_code': '#Fa4'
+        },
+    'AUX': {
+        'lable':"གྲོགས",
+        'color_code': '#e99'
+        },
+    'CCONJ': {
+        'lable':"སྦྲེལ",
+        'color_code': '#b29'
+        },
+    'DET': {
+        'lable':"ངེས",
+        'color_code': '#9a9'
+        },
+    'INTJ': {
+        'lable':"འབོད",
+        'color_code': '#e22'
+        },
+    'NOUN': {
+        'lable':"མིང",
+        'color_code': '#afa'
+        },
+    'NUM': {
+        'lable':"གྲངས",
+        'color_code': '#ef1'
+        },
+    'PRON': {
+        'lable':"ཚབ",
+        'color_code': '#a32'
+        },
+    'PROPN': {
+        'lable':"ཁྱད",
+        'color_code': '#fc4'
+        },
+    'PUNCT': {
+        'lable':"ཚེག",
+        'color_code': '#ad2'
+        },
+    'SCONJ': {
+        'lable':"ལྟོས",
+        'color_code': '#fa3'
+        },
+    'VERB': {
+        'lable':"བྱ",
+        'color_code': '#d2a'
+        },
+    'PART': {
+        'lable':"རོགས",
+        'color_code': '#faa'
+        },
 }
+
 
 def get_tokens(text):
     tokens = wt.tokenize(text, split_affixes=False)
@@ -65,7 +122,7 @@ def annotate_segmentations(tokens):
     segmentation_annotations = []
     for token in tokens:
         token_text = token.text
-        segmentation_annotations.append((token_text, '', '#FFF'))
+        segmentation_annotations.append((f'{token_text} ', '', '#FFECD6'))
     return segmentation_annotations
 
 def annotate_pos(tokens):
@@ -73,11 +130,13 @@ def annotate_pos(tokens):
     for token in tokens:
         token_text = token.text
         token_pos = token.pos
-        token_ann = pos_ann.get(token_pos, '')
-        if token_ann:
-            pos_annotations.append((token_text, token_pos, token_ann))
+        token_ann_info = pos_ann.get(token_pos, {})
+        if token_ann_info:
+            token_ann = token_ann_info.get('color_code', '')
+            ann_label = token_ann_info.get('lable','')
+            pos_annotations.append((token_text, ann_label, token_ann))
         else:
-            pos_annotations.append(token_text)
+            pos_annotations.append((token_text, token_pos, '#e34'))
     return pos_annotations
 
 def get_annotated_text(annotated_tokens):
@@ -97,23 +156,30 @@ def get_annotated_text(annotated_tokens):
 
     st.markdown(str(out), unsafe_allow_html=True)
 
-level_annotations = []
-segmentation_annotations = []
-pos_annotations = []
+def initialize_annotations(user_input):
+    level_annotations = []
+    segmentation_annotations = []
+    pos_annotations = []
+    tokens = get_tokens(user_input)
+    level_annotations = annotate_level(tokens)
+    segmentation_annotations = annotate_segmentations(tokens)
+    pos_annotations = annotate_pos(tokens)
+    return level_annotations, segmentation_annotations, pos_annotations
+
 user_input = st.text_area("Enter text here", "")
-tokens = get_tokens(user_input)
-level_annotations = annotate_level(tokens)
-segmentation_annotations = annotate_segmentations(tokens)
-pos_annotations = annotate_pos(tokens)
 
+level_annotations, segmentation_annotations, pos_annotations = initialize_annotations(user_input)
 
-col1, col2, col3 = st.beta_columns(3)
+col1, col2, col3, col4, col5, col6, col7, col8= st.beta_columns(8)
+
 with col1:
     assess_level_flag = st.button('Assess Level')
 with col2:
     seg_flag = st.button('Get Segmentation')
 with col3:
     pos_flag = st.button('Get PosTag')
+with col8:
+    reset = st.button('Reset Tokenizer')
 
 if assess_level_flag:
     get_annotated_text(annotated_tokens=level_annotations)
@@ -123,5 +189,9 @@ if seg_flag:
 
 if pos_flag:
     get_annotated_text(annotated_tokens=pos_annotations)
+
+if reset:
+    wt.tok.trie.rebuild_trie()
+    level_annotations, segmentation_annotations, pos_annotations = initialize_annotations(user_input)
 
 # ང་བོད་ལ་འགྲོ་ནས་སླེད་པ་ཡིན་ སེམས་ཅན་ཐམས་ཅད་ལ་བཀྲ་ཤིས་བདེ་ལེགས་ཞུས་རྒྱུ་ཡིན་ སེམས་པ་སྐྱིད་པོ་འདུག།
