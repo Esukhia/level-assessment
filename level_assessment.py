@@ -22,7 +22,8 @@ level_dict = {
     'ནས་': 'l1',
     'ཡིན་': 'l1',
     'སེམས་པ་':'l2',
-    'ཐམས་ཅད་': 'l3'
+    'ཐམས་ཅད་': 'l3',
+    'ཚང་མ་': 'l1'
 }
 
 level_code_lookup = {
@@ -175,7 +176,7 @@ col1, col2, col3, col4, col5, col6, col7, col8= st.beta_columns(8)
 with col1:
     assess_level_flag = st.button('Assess Level')
 with col2:
-    seg_flag = st.button('Get Segmentation')
+    seg_flag = st.button("Get Segmentations")
 with col3:
     pos_flag = st.button('Get PosTag')
 with col8:
