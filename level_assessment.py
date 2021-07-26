@@ -131,6 +131,8 @@ def annotate_pos(tokens):
     for token in tokens:
         token_text = token.text
         token_pos = token.pos
+        if token_pos == '' and token.chunk_type == 'PUNCT':
+            token_pos = 'PUNCT'
         token_ann_info = pos_ann.get(token_pos, {})
         if token_ann_info:
             token_ann = token_ann_info.get('color_code', '')
